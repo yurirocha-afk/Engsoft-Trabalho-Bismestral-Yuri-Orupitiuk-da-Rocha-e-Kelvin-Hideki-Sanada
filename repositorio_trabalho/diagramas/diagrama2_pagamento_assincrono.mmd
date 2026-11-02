@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    participant Ctrl as PagamentoController
+    participant Pedido
+    participant Reserva as ReservaEstoque
+    participant Gateway as GatewayPagamento
+    participant Email as ServicoEmail
+    activate Ctrl
+    Ctrl->>+Pedido: marcarAguardandoPagamento()
+    Pedido-->>-Ctrl: statusAtualizado
+    Ctrl-)Gateway: solicitarCobranca(numeroPedido, valorTotal)
+    deactivate Ctrl
+    Note over Ctrl,Gateway: Assíncrona: o controle não aguarda a resposta do gateway
+    Gateway-)+Ctrl: notificarResultado(numeroPedido, APROVADO)
+    Ctrl->>+Pedido: confirmarPagamento()
+    Pedido-->>-Ctrl: statusAtualizado
+    create participant Comprovante
+    Ctrl->>Comprovante: «create» Comprovante(pedido)
+    destroy Reserva
+    Ctrl-xReserva: «destroy» encerrarReserva()
+    Ctrl-)Email: enviarConfirmacao(numeroPedido)
+    deactivate Ctrl

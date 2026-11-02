@@ -1,0 +1,23 @@
+sequenceDiagram
+    autonumber
+    actor Cliente
+    participant Tela as TelaCheckout
+    participant Ctrl as PedidoController
+    participant Carrinho
+    participant Estoque
+    Cliente->>+Tela: confirmarCompra()
+    Tela->>+Ctrl: finalizarCompra(idCarrinho)
+    Ctrl->>+Carrinho: obterItens()
+    Carrinho-->>-Ctrl: listaDeItens
+    Ctrl->>+Ctrl: validarItens(listaDeItens)
+    Ctrl-->>-Ctrl: itensValidos
+    Ctrl->>+Estoque: reservar(itensValidos)
+    Estoque-->>-Ctrl: reservaConfirmada
+    create participant Pedido
+    Ctrl->>Pedido: «create» Pedido(cliente, itensValidos)
+    Ctrl->>+Pedido: calcularTotal()
+    Pedido-->>-Ctrl: valorTotal
+    destroy Carrinho
+    Ctrl-xCarrinho: «destroy» descartar()
+    Ctrl-->>-Tela: numeroDoPedido
+    Tela-->>-Cliente: exibirConfirmacao(numeroDoPedido)
